@@ -3,6 +3,7 @@ package com.basket.product.controller;
 import com.basket.category.entity.Category;
 import com.basket.product.entity.Product;
 import com.basket.product.service.ProductService;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -56,4 +57,29 @@ public class ProductController {
         productService.deleteUpdateById(id);
         return "Product deleted successfully";
     }
+
+    @GetMapping("/search")
+    public List<Product> searchByName(@RequestParam String name){
+
+        return productService.searchProductsByName(name);
+    }
+
+    @GetMapping("/category/{categoryId}")
+    public List<Product> getProductsByCategoryId(@PathVariable Long categoryId)
+    {
+        return productService.getProductsByCategoryId(categoryId);
+    }
+
+    //Pagination
+    @GetMapping("/page")
+    public Page<Product> getProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction) {
+
+        return productService.getProducts(
+                page, size, sortBy, direction);
+    }
+
 }
