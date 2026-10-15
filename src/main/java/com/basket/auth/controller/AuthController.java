@@ -4,6 +4,7 @@ import com.basket.auth.dto.LoginRequest;
 import com.basket.auth.dto.LoginResponse;
 import com.basket.auth.dto.RegisterRequest;
 import com.basket.auth.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,7 +20,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String register(@RequestBody RegisterRequest request)
+    public String register(@Valid @RequestBody RegisterRequest request)
     {
 
         userService.registerUser(request);
@@ -27,7 +28,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginRequest request) {
+    public LoginResponse login(@Valid @RequestBody LoginRequest request) {
 
         System.out.println(">>> LOGIN API HIT <<<");
 

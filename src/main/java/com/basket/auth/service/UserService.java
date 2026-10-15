@@ -5,9 +5,11 @@ import com.basket.auth.dto.RegisterRequest;
 import com.basket.auth.entity.Role;
 import com.basket.auth.entity.User;
 import com.basket.auth.repository.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.basket.auth.dto.LoginRequest;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class UserService {
@@ -38,6 +40,13 @@ public class UserService {
         user.setRole(Role.USER);
         user.setActive(true);
 
+        if(userRepository.existsByEmail(request.getEmail()))
+        {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Email is already registered"
+            );
+        }
         return userRepository.save(user);
     }
 

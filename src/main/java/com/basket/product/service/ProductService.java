@@ -2,6 +2,7 @@ package com.basket.product.service;
 
 import com.basket.category.entity.Category;
 import com.basket.category.repository.CategoryRepository;
+import com.basket.common.exception.ResourceNotFoundException;
 import com.basket.product.entity.Product;
 import com.basket.product.repository.ProductRepository;
 import org.springframework.data.domain.Page;
@@ -50,13 +51,14 @@ public class ProductService {
 
     public Product getProductById(Long id) {
         return productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Porduct Not Found with id ! : " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Product Not Found with id ! : " + id));
 
     }
 
     public Product updateProductById(Long id, Product updateProduct) {
         Product existingProduct = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product is not found with this id " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Product is not found with id " + id));
+
 
         existingProduct.setName(updateProduct.getName());
         existingProduct.setDescription(updateProduct.getDescription());
@@ -70,13 +72,16 @@ public class ProductService {
             Category category = categoryRepository.findById(categoryId)
                     .orElseThrow(()-> new RuntimeException("category is not found"));
             existingProduct.setCategory(category);
+
+            System.out.println("Category after update: " +
+                    existingProduct.getCategory().getId());
         }
         return productRepository.save(existingProduct);
     }
 
     public void deleteUpdateById(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product Not Found "));
+                .orElseThrow(() -> new ResourceNotFoundException("Product Not Found "));
 
         productRepository.delete(product);
     }

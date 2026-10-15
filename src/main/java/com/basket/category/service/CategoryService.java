@@ -2,6 +2,7 @@ package com.basket.category.service;
 
 import com.basket.category.entity.Category;
 import com.basket.category.repository.CategoryRepository;
+import com.basket.common.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,13 +29,13 @@ public class CategoryService {
 
     public Category getCategoryById(Long id){
         return categoryRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("Category Not Found!"));
+                .orElseThrow(()-> new ResourceNotFoundException("Category Not Found!"));
     }
 
     public Category updateCategoryById(Long id,Category updateCategory){
 
         Category existingCategory = categoryRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("Category Not Found!"));
+                .orElseThrow(()-> new ResourceNotFoundException("Category Not Found!"));
 
         existingCategory.setName(updateCategory.getName());
         existingCategory.setDescription((updateCategory.getDescription()));
@@ -45,7 +46,7 @@ public class CategoryService {
     public void deleteCategory(Long id)
     {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("Category Not Found!"));
+                .orElseThrow(()-> new ResourceNotFoundException("Category Not Found!"));
 
         categoryRepository.delete(category);
     }

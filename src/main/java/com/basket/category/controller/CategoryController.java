@@ -2,6 +2,7 @@ package com.basket.category.controller;
 
 import com.basket.category.entity.Category;
 import com.basket.category.service.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public class CategoryController {
     }
 
     @PostMapping
-    public Category createCategory(@RequestBody Category category){
+    public Category createCategory(@Valid @RequestBody Category category){
         return categoryService.createCategory(category);
     }
 
@@ -34,7 +35,7 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
-    public Category updateCategoryById(@PathVariable Long id,@RequestBody Category category)
+    public Category updateCategoryById(@PathVariable Long id,@Valid @RequestBody Category category)
     {
         return categoryService.updateCategoryById(id, category);
     }

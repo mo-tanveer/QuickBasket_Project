@@ -3,6 +3,7 @@ package com.basket.product.controller;
 import com.basket.category.entity.Category;
 import com.basket.product.entity.Product;
 import com.basket.product.service.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +21,7 @@ public class ProductController {
     }
 
     @PostMapping
-    public Product createProduct(@RequestBody Product product)
+    public Product createProduct(@Valid @RequestBody Product product)
     {
 
         System.out.println("prodcuct name:" + product.getName());
@@ -46,7 +47,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public Product updateProductById(@PathVariable Long id, @RequestBody Product product)
+    public Product updateProductById(@PathVariable Long id,@Valid @RequestBody Product product)
     {
         return productService.updateProductById(id,product);
     }
