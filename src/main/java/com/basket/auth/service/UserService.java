@@ -4,6 +4,8 @@ import com.basket.auth.dto.LoginResponse;
 import com.basket.auth.dto.RegisterRequest;
 import com.basket.auth.entity.Role;
 import com.basket.auth.entity.User;
+import com.basket.auth.refresh.RefreshToken;
+import com.basket.auth.refresh.RefreshTokenService;
 import com.basket.auth.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,13 +19,15 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
 
     public UserService(UserRepository userRepository,
-                       PasswordEncoder passwordEncoder, JwtService jwtService) {
+                       PasswordEncoder passwordEncoder, JwtService jwtService, RefreshTokenService refreshTokenService) {
 
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.refreshTokenService = refreshTokenService;
     }
 
     public User registerUser( RegisterRequest request) {
@@ -59,16 +63,18 @@ public class UserService {
             throw new RuntimeException(("Invalid email or Password"));
         }
 
-        String token = jwtService.generateToken(
+        String accessToken = jwtService.generateAccessToken(
                 user.getEmail(),
                 user.getRole().name()
         );
+
+        String refreshToken = refreshTokenService.createRefreshToken(user);
         return new LoginResponse(
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
                 user.getRole(),
-                token
+                accessToken
         );
     }
 }

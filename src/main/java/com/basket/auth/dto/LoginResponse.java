@@ -9,13 +9,13 @@ public class LoginResponse {
     private String name;
     private String email;
     private Role role;
-    private String token;
-    public LoginResponse(Long id, String name, String email, Role role,String token)
+    private String accessToken;
+    public LoginResponse(Long id, String name, String email, Role role,String accessToken)
     {
         this.id = id;
         this.name = name;
         this.email = email;
         this.role = role;
-        this.token = token;
+        this.accessToken = accessToken;
     }
 }

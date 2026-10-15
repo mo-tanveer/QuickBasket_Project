@@ -16,30 +16,37 @@ public class JwtService {
                     "my-super-secret-key-for-quickbasket-1234567"
                             .getBytes()
             );
-    private final long expirationTime = 86400000; //24 hours
+    private final long accessTokenExpiration = 15 * 60 * 1000;
 
 
-    public String generateToken(String email, String role)
+    public String generateAccessToken(String email, String role)
     {
-        return Jwts.builder()
+        return  Jwts.builder()
                 .subject(email)
-                .claim("role",role)
+                .claim("role", role)
+                .claim("tokenType" , "Access")
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + expirationTime))
+                .expiration(
+                        new Date(System.currentTimeMillis() + accessTokenExpiration)
+                )
                 .signWith(secretKey)
                 .compact();
     }
 
+
     public String extractEmail(String token)
     {
+
         return getClaims(token).getSubject();
     }
 
-    public boolean isTokenValid(String token)
+    public boolean isAccessTokenValid(String token)
     {
         try{
-            getClaims(token);
-            return true;
+            Claims claims =  getClaims(token);
+            return "ACCESS".equals(
+                    claims.get("tokenType",String.class)
+            );
         }
         catch (Exception e)
         {

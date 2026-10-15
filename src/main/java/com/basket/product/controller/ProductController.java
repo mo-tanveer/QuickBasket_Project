@@ -5,6 +5,8 @@ import com.basket.product.entity.Product;
 import com.basket.product.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,18 +23,13 @@ public class ProductController {
     }
 
     @PostMapping
-    public Product createProduct(@Valid @RequestBody Product product)
+    public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product)
     {
 
-        System.out.println("prodcuct name:" + product.getName());
-
-        System.out.println("category object " + product.getCategory());
-
-        if(product.getCategory() != null)
-        {
-            System.out.println("Category Id : " + product.getCategory().getId());
-        }
-        return productService.createProduct(product);
+        Product savedProduct = productService.createProduct(product);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(savedProduct);
     }
 
     @GetMapping
@@ -41,46 +38,58 @@ public class ProductController {
     }
 
     @GetMapping({"/{id}"})
-    public Product getProductById(@PathVariable Long id)
+    public ResponseEntity<Product> getProductById(@PathVariable Long id)
     {
-        return productService.getProductById(id);
+        Product product = productService.getProductById(id);
+        return ResponseEntity
+                .ok(product);
     }
 
     @PutMapping("/{id}")
-    public Product updateProductById(@PathVariable Long id,@Valid @RequestBody Product product)
+    public ResponseEntity<Product> updateProductById(
+            @PathVariable Long id,@Valid @RequestBody Product product)
     {
-        return productService.updateProductById(id,product);
+        Product updateProduct = productService.updateProductById(id,product);
+        return ResponseEntity
+                .ok(updateProduct);
     }
 
     @DeleteMapping("/{id}")
-    public String deleteProductById(@PathVariable Long id)
+    public ResponseEntity<Void> deleteProductById(@PathVariable Long id)
     {
         productService.deleteUpdateById(id);
-        return "Product deleted successfully";
+        return ResponseEntity
+                .noContent().build();
     }
 
     @GetMapping("/search")
-    public List<Product> searchByName(@RequestParam String name){
+    public ResponseEntity<List<Product>> searchByName(@RequestParam String name){
 
-        return productService.searchProductsByName(name);
+        List<Product> products = productService.searchProductsByName(name);
+        return ResponseEntity
+                .ok(products);
     }
 
     @GetMapping("/category/{categoryId}")
-    public List<Product> getProductsByCategoryId(@PathVariable Long categoryId)
+    public ResponseEntity<List<Product> > getProductsByCategoryId(@PathVariable Long categoryId)
     {
-        return productService.getProductsByCategoryId(categoryId);
+        List<Product> products = productService.getProductsByCategoryId(categoryId);
+        return ResponseEntity
+                .ok(products);
     }
 
     //Pagination
     @GetMapping("/page")
-    public Page<Product> getProducts(
+    public ResponseEntity<Page<Product>> getProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String direction) {
 
-        return productService.getProducts(
+        Page<Product> products = productService.getProducts(
                 page, size, sortBy, direction);
+        return ResponseEntity
+                .ok(products);
     }
 
 }
