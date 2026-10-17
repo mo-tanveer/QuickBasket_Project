@@ -1,6 +1,7 @@
 package com.basket.auth.service;
 
 import com.basket.auth.dto.LoginResponse;
+import com.basket.auth.dto.LoginResult;
 import com.basket.auth.dto.RegisterRequest;
 import com.basket.auth.entity.Role;
 import com.basket.auth.entity.User;
@@ -54,7 +55,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public LoginResponse loginUser(LoginRequest request)
+    public LoginResult loginUser(LoginRequest request)
     {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(()-> new RuntimeException("Invalid  email or password"));
@@ -69,6 +70,37 @@ public class UserService {
         );
 
         String refreshToken = refreshTokenService.createRefreshToken(user);
+
+        LoginResponse response =new LoginResponse(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getRole(),
+                accessToken
+        );
+
+        return new LoginResult(response,refreshToken);
+    }
+
+
+    public LoginResponse refreshAccessToken(String rawRefreshToken){
+
+        RefreshToken refreshToken = refreshTokenService
+                .findValidRefreshToken(rawRefreshToken)
+                .orElseThrow(()-> new RuntimeException("Invalid refresh token"));
+
+        User user = refreshToken.getUser();
+
+        if(!user.isActive())
+        {
+            throw  new RuntimeException("user account is inactive");
+        }
+
+        String accessToken = jwtService.generateAccessToken(
+                user.getEmail(),
+                user.getRole().name()
+        );
+
         return new LoginResponse(
                 user.getId(),
                 user.getName(),
@@ -77,4 +109,5 @@ public class UserService {
                 accessToken
         );
     }
+
 }

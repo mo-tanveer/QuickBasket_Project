@@ -10,6 +10,7 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
+import java.util.Optional;
 
 @Service
 public class RefreshTokenService {
@@ -62,5 +63,15 @@ public class RefreshTokenService {
                     "Unable to hash refresh token", e
             );
         }
+    }
+
+
+    public Optional<RefreshToken> findValidRefreshToken(String rawToken)
+    {
+        String tokenHash = hashToken(rawToken);
+
+        return refreshTokenRepository.findByTokenHash(tokenHash)
+                .filter(token -> !token.isRevoked())
+                .filter(token-> token.getExpiryDate().isAfter(Instant.now()));
     }
 }
