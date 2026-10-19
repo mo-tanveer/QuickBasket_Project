@@ -74,4 +74,16 @@ public class RefreshTokenService {
                 .filter(token -> !token.isRevoked())
                 .filter(token-> token.getExpiryDate().isAfter(Instant.now()));
     }
+
+    @Transactional
+    public void revokeRefreshToken(String rawToken)
+    {
+        String tokenHash = hashToken(rawToken);
+
+        refreshTokenRepository.findByTokenHash(tokenHash)
+                .ifPresent(token -> {
+                    token.setRevoked(true);
+                    refreshTokenRepository.save(token);
+                });
+    }
 }

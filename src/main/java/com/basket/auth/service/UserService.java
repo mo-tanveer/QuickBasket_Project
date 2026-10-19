@@ -8,6 +8,7 @@ import com.basket.auth.entity.User;
 import com.basket.auth.refresh.RefreshToken;
 import com.basket.auth.refresh.RefreshTokenService;
 import com.basket.auth.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -82,32 +83,40 @@ public class UserService {
         return new LoginResult(response,refreshToken);
     }
 
+    @Transactional
+    public LoginResult refreshAccessToken(String rawRefreshToken) {
 
-    public LoginResponse refreshAccessToken(String rawRefreshToken){
-
-        RefreshToken refreshToken = refreshTokenService
+        RefreshToken oldToken = refreshTokenService
                 .findValidRefreshToken(rawRefreshToken)
-                .orElseThrow(()-> new RuntimeException("Invalid refresh token"));
+                .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
 
-        User user = refreshToken.getUser();
+        User user = oldToken.getUser();
 
-        if(!user.isActive())
-        {
-            throw  new RuntimeException("user account is inactive");
+        if (!user.isActive()) {
+            throw new RuntimeException("User account is inactive");
         }
 
+        // Revoke the old refresh token
+        refreshTokenService.revokeRefreshToken(rawRefreshToken);
+
+        // Generate a new access token
         String accessToken = jwtService.generateAccessToken(
                 user.getEmail(),
                 user.getRole().name()
         );
 
-        return new LoginResponse(
+        // Generate a new refresh token
+        String newRefreshToken = refreshTokenService.createRefreshToken(user);
+
+        LoginResponse response = new LoginResponse(
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
                 user.getRole(),
                 accessToken
         );
+
+        return new LoginResult(response, newRefreshToken);
     }
 
 }

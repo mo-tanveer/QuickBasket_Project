@@ -83,9 +83,20 @@ public class AuthController {
             );
         }
 
-        LoginResponse response =
+       LoginResult result =
                 userService.refreshAccessToken(rawRefreshToken);
 
-        return ResponseEntity.ok(response);
+        ResponseCookie refreshCookie = ResponseCookie
+                .from("refreshToken", result.refreshToken())
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("Lax")
+                .maxAge(Duration.ofDays(7))
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                .body(result.response());
+
     }
 }
