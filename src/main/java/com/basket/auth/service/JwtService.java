@@ -22,9 +22,10 @@ public class JwtService {
     public String generateAccessToken(String email, String role)
     {
         return  Jwts.builder()
+                .id(java.util.UUID.randomUUID().toString())  //New
                 .subject(email)
                 .claim("role", role)
-                .claim("tokenType" , "Access")
+                .claim("tokenType" , "ACCESS")
                 .issuedAt(new Date())
                 .expiration(
                         new Date(System.currentTimeMillis() + accessTokenExpiration)
@@ -38,6 +39,15 @@ public class JwtService {
     {
 
         return getClaims(token).getSubject();
+    }
+
+    public  String extractJti(String token)
+    {
+        return  getClaims(token).getId();
+    }
+
+    public Date extractExpiration(String token){
+        return  getClaims(token).getExpiration();
     }
 
     public boolean isAccessTokenValid(String token)

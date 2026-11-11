@@ -38,7 +38,7 @@ public class UserService {
 
         user.setName(request.getName());
         user.setEmail(request.getEmail());
-
+        user.setPhone(request.getPhone());
         user.setPassword(
                 passwordEncoder.encode(request.getPassword())
         );
@@ -119,4 +119,10 @@ public class UserService {
         return new LoginResult(response, newRefreshToken);
     }
 
+
+    //logout
+    public void logout(String rawRefreshToken)
+    {
+        refreshTokenService.revokeRefreshToken(rawRefreshToken);
+    }
 }

@@ -3,6 +3,7 @@ package com.basket.auth.security;
 import com.basket.auth.entity.User;
 import com.basket.auth.repository.UserRepository;
 import com.basket.auth.service.JwtService;
+import com.basket.auth.service.TokenBlacklistService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,13 +20,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final  TokenBlacklistService tokenBlacklistService;
 
     public JwtAuthenticationFilter(
             JwtService jwtService,
-            UserRepository userRepository)
+            UserRepository userRepository, TokenBlacklistService tokenBlacklistService)
     {
         this.jwtService = jwtService;
         this.userRepository = userRepository;
+        this.tokenBlacklistService = tokenBlacklistService;
     }
     @Override
     protected void doFilterInternal(
@@ -47,8 +50,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
          String token = authorizationHeader.substring(7);
 
         try{
-            if(jwtService.isAccessTokenValid(token))
-            {
+            if (jwtService.isAccessTokenValid(token)
+                    && !tokenBlacklistService.isBlacklisted(jwtService.extractJti(token))) {
                 //jwt se email extract
                 String email = jwtService.extractEmail(token);
 

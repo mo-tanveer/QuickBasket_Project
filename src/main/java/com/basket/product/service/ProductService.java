@@ -59,6 +59,8 @@ public class ProductService {
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product is not found with id " + id));
 
+        existingProduct.setImageUrl(updateProduct.getImageUrl());
+        existingProduct.setMrp(updateProduct.getMrp());
 
         existingProduct.setName(updateProduct.getName());
         existingProduct.setDescription(updateProduct.getDescription());
