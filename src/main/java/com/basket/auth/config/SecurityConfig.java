@@ -50,6 +50,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/vendor/**").hasRole("VENDOR")
                         .requestMatchers("/api/user/**").hasRole("USER")
                         .requestMatchers("/api/cart/**").hasRole("USER")
+                        .requestMatchers("/api/addresses/**").hasRole("USER")
                         // Read-only endpoints: public
                         .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/categories/**").permitAll()
                         // Create / update / delete: ADMIN only (USER gets 403)
